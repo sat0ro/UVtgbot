@@ -1,13 +1,14 @@
 import logging
 import asyncio
 import nest_asyncio
+
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 from src.weather import get_weather
 from src.database import init_db, set_user_city, get_user_city, set_notification_time
 from src.notification import remove_job_if_exists, set_daily_notification
 
-TOKEN = '849815581:AAEi6nWb6XFX_-hjLQ6WlU4GQlc4O0JOwBc'
+TOKEN = '7403956307:AAFThQa26u2muLuLwgiNAKJV9dOA6izHLJc'
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)

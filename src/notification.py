@@ -1,5 +1,5 @@
 from telegram.ext import CallbackContext
-from src.database import get_user_city
+from src.database import get_user_city, set_notification_time
 from src.weather import get_weather
 import datetime
 
@@ -13,7 +13,15 @@ def remove_job_if_exists(name: str, context: CallbackContext) -> bool:
 
 def set_daily_notification(context: CallbackContext, user_id: int, time: str) -> None:
     hour, minute = map(int, time.split(':'))
+
+    # Запускаем ежедневное уведомление
     context.job_queue.run_daily(send_weather_update, time=datetime.time(hour, minute), context=user_id, name=str(user_id))
+
+    # Сохраняем время уведомления для пользователя
+    set_notification_time(user_id, time)
+
+    # Отправляем сообщение пользователю о успешной установке уведомления
+    context.bot.send_message(user_id, text=f'Ежедневное уведомление о погоде успешно установлено на {time}')
 
 async def send_weather_update(context: CallbackContext) -> None:
     job = context.job
