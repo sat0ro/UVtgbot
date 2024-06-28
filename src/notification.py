@@ -1,5 +1,5 @@
 from telegram.ext import CallbackContext
-from src.database import get_user_city, set_notification_time
+from src.database import get_user_city, set_notification_time, delete_notification_time
 from src.weather import get_weather
 import datetime
 
@@ -15,7 +15,7 @@ def set_daily_notification(context: CallbackContext, user_id: int, time: str) ->
     hour, minute = map(int, time.split(':'))
 
     # Запускаем ежедневное уведомление
-    context.job_queue.run_daily(send_weather_update, time=datetime.time(hour, minute), context=user_id, name=str(user_id))
+    context.job_queue.run_daily(send_weather_update, time=datetime.time(hour, minute), data=user_id, name=str(user_id))
 
     # Сохраняем время уведомления для пользователя
     set_notification_time(user_id, time)
@@ -25,7 +25,7 @@ def set_daily_notification(context: CallbackContext, user_id: int, time: str) ->
 
 async def send_weather_update(context: CallbackContext) -> None:
     job = context.job
-    user_id = job.context
+    user_id = job.data
     city = get_user_city(user_id)
     if city:
         weather_data = get_weather(city)
@@ -36,4 +36,14 @@ async def send_weather_update(context: CallbackContext) -> None:
         else:
             await context.bot.send_message(user_id, text='Не удалось получить данные о погоде. Попробуйте позже.')
     else:
-        await context.bot.send_message(user_id, text='Сначала установите ваш город с помощью команды "Set City".')
+        await context.bot.send_message(user_id, text='Сначала установите ваш город с помощью команды "Указать город".')
+
+async def remove_daily_notification(context: CallbackContext, user_id: int) -> None:
+    job_removed = remove_job_if_exists(str(user_id), context)
+    if job_removed:
+        delete_notification_time(user_id)
+        await context.bot.send_message(user_id, text='Ежедневное уведомление было успешно удалено.')
+    else:
+        await context.bot.send_message(user_id, text='У вас нет активного ежедневного уведомления.')
+
+

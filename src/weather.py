@@ -3,8 +3,8 @@ import requests
 WEATHER_API_KEY = 'a420cab78ccaeb4f0c39e6f9b952c05d'
 
 
-def get_weather(city: object) -> object:
-    weather_url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={WEATHER_API_KEY}&units=metric'
+def get_weather(city: str):
+    weather_url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={WEATHER_API_KEY}&units=metric&lang=ru'
     weather_response = requests.get(weather_url)
     if weather_response.status_code == 200:
         weather_data = weather_response.json()
@@ -24,3 +24,4 @@ def get_uv_index(lat, lon):
         return uv_data['value']
     else:
         return None
+

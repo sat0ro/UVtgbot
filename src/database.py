@@ -50,3 +50,25 @@ def get_notification_time(user_id):
         return result[0]
     else:
         return None
+
+def delete_user(user_id):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM users WHERE user_id = ?', (user_id,))
+    conn.commit()
+    conn.close()
+
+def delete_notification_time(user_id):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('UPDATE users SET notification_time = NULL WHERE user_id = ?', (user_id,))
+    conn.commit()
+    conn.close()
+
+def get_all_users_with_notifications():
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('SELECT user_id, notification_time FROM users WHERE notification_time IS NOT NULL')
+    users = cursor.fetchall()
+    conn.close()
+    return users
